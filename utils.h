@@ -1,5 +1,6 @@
 #pragma once
 #include <random>
+#include "vec3.h"
 
 inline double random_double() {
     static std::uniform_real_distribution<double> distribution(0.0, 1.0);
@@ -10,5 +11,12 @@ inline double random_double(double min, double max) {
     static std::uniform_real_distribution<double> distribution(min, max);
     static std::mt19937 generator;
     return distribution(generator);
+}
+inline vec3 random_unit_vector() {
+    double x = random_double(-1,1);
+    double y = random_double(-1,1);
+    double z = random_double(-1,1);
+    vec3 v(x,y,z);
+    return v.normalize();
 }
 

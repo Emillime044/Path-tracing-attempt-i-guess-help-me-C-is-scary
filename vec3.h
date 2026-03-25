@@ -21,6 +21,9 @@ class vec3 {
     vec3 operator*(const double other) const {
         return vec3(x * other, y * other, z * other);
     }
+    vec3 operator*(const vec3 other) const {
+        return vec3(x * other.x, y * other.y, z * other.z);
+    }
     vec3 operator/(const double other) const {
         return vec3(x / other, y/other, z/other);
     }
