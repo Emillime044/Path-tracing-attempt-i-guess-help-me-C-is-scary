@@ -13,7 +13,7 @@ class HittableList : public Hittable {
             objects.push_back(object);
         }
 
-        bool hit(const ray&r, hit_record& rec) override {
+        bool hit(const ray&r, hit_record& rec) const override {
             bool hit_anything = false;
             for (Hittable* obj: objects) {
                 if (obj->hit(r, rec)) {
