@@ -12,7 +12,7 @@ class ray {
         this->direction=direction;
     }
 
-    vec3 at(double t) {
+    vec3 at(double t) const {
         return origin + direction*t;
     }
 };
