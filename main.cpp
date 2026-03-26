@@ -1,4 +1,6 @@
 #include <iostream>
+#include <omp.h>
+#include <fstream>
 #include <cmath>
 #include "vec3.h"
 #include "ray.h"
@@ -8,9 +10,11 @@
 #include "hit_record.h"
 #include "utils.h"
 #include "lambertian.h"
+#include "metal.h"
+#include "dielectric.h"
 
 vec3 ray_color(const ray& r, const HittableList& items, int depth) {
-    if (depth <= 0) return vec3(0,0,0);
+    if (depth <= 0) return vec3(0.05,0.05,0.05); // se finisce la depth aggiungo un po' di luce ambientale cosi che non diventino neri i riflessi
 
     hit_record rec;
     if (items.hit(r, rec)) {
@@ -59,22 +63,33 @@ int main() {
     // Centro del primo pixel (0,0)
     vec3 pixel00 = viewport_upper_left + (pixel_delta_u + pixel_delta_v) * 0.5;
 
+    // Refraction index
+    const double glass = 1.5;
+    const double diamond = 2.4;
+    const double air = 1.0;
+    const double water = 1.33;
+
     // Scena
     HittableList items;
-    items.add(new Sphere(vec3(2, 0, -3), 0.4, new Lambertian(vec3(0.8, 0.2, 0.2))));
-    items.add(new Sphere(vec3(-2, 0, -3), 0.4, new Lambertian(vec3(0.2, 0.2, 0.8))));
-    items.add(new Sphere(vec3(0, 0, -3), 0.4, new Lambertian(vec3(0.2, 0.8, 0.2))));
+    items.add(new Sphere(vec3(2, 0, -4), 0.4, new Lambertian(vec3(0.8, 0.2, 0.2))));
+    items.add(new Sphere(vec3(-2, 0, -3), 0.4, new Metal(vec3(0.2, 0.2, 0.8))));
+    items.add(new Sphere(vec3(0, 0, -5), 0.4, new Dielectric(glass)));
     
     items.add(new Sphere(vec3(0, -100.5, -10), 100.0, new Lambertian(vec3(0.7, 0.7, 0.7))));
 
     // Render
     const int samples = 100;
-    const int max_depth = 10;
+    const int max_depth = 50;
 
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    // File
+    std::ofstream file("image.ppm");
+    file << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+
+    // Multithreading
+    std::vector<vec3> pixels(image_width * image_height);
+    #pragma omp parallel for schedule(dynamic, 1)
 
     for (int j = 0; j < image_height; j++) {
-        std::cerr << image_height - j << " lines remaining\r";
         for (int i = 0; i < image_width; i++) {
             vec3 color(0, 0, 0);
             for (int s = 0; s < samples; s++) {
@@ -91,16 +106,24 @@ int main() {
                 color = color + ray_color(r, items, max_depth);
             }
             color = color / samples;
-
             // Gamma correction (gamma 2)
             color = vec3(sqrt(color.x), sqrt(color.y), sqrt(color.z));
+            pixels[j * image_width + i] = color;
+        }
+    }
 
-            std::cout << int(255.999 * color.x) << ' '
-                      << int(255.999 * color.y) << ' '
-                      << int(255.999 * color.z) << '\n';
+    for (int j = 0; j < image_height; j++) {
+        for(int i = 0; i < image_width; i++) {
+            vec3 c = pixels[j * image_width + i];
+            file << int(255.999 * c.x) << ' '
+                 << int(255.999 * c.y) << ' '
+                 << int(255.999 * c.z) << '\n';
         }
     }
 
     std::cerr << "\nDone.\n";
+    file.close();
+    system("convert image.ppm image.png");
+
     return 0;
 }

@@ -12,31 +12,34 @@ class vec3 {
         this->y=y;
         this->z=z;
     }
-    vec3 operator+(const vec3& other) const {
+    virtual inline vec3 operator+(const vec3& other) const {
         return vec3(x + other.x, y + other.y, z + other.z);
     }
-    vec3 operator-(const vec3& other) const {
+    virtual inline vec3 operator-(const vec3& other) const {
         return vec3(x - other.x, y - other.y, z - other.z);
     }
-    vec3 operator*(const double other) const {
+    virtual inline vec3 operator-() const {
+        return vec3(-x, -y, -z);
+    }
+    virtual inline vec3 operator*(const double other) const {
         return vec3(x * other, y * other, z * other);
     }
-    vec3 operator*(const vec3 other) const {
+    virtual inline vec3 operator*(const vec3 other) const {
         return vec3(x * other.x, y * other.y, z * other.z);
     }
-    vec3 operator/(const double other) const {
+    virtual inline vec3 operator/(const double other) const {
         return vec3(x / other, y/other, z/other);
     }
-    vec3 crossProduct(const vec3& other) const  {
+    virtual inline vec3 crossProduct(const vec3& other) const  {
         return vec3(y*other.z - z*other.y, z*other.x - x*other.z, x*other.y - y*other.x);
     }
-    double length() const {
+    virtual inline double length() const {
         return sqrt(x*x + y*y + z*z);
     }
-    double dotProduct(const vec3& other) const {
+    virtual inline double dotProduct(const vec3& other) const {
         return x * other.x + y * other.y + z * other.z;
     }
-    vec3 normalize() const {
+    virtual inline vec3 normalize() const {
         double l = length();
         return vec3(x/l, y/l, z/l);
     }

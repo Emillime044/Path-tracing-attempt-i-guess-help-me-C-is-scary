@@ -22,7 +22,7 @@ class Sphere : public Hittable {
             this->material = material;
         }
     
-        bool hit(const ray& r, hit_record& rec) const override {
+        virtual inline bool hit(const ray& r, hit_record& rec) const override {
             vec3 Q = r.origin - center;
             double a = r.direction.dotProduct(r.direction);
             double b = 2*Q.dotProduct(r.direction);
