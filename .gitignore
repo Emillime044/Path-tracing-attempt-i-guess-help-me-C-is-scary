@@ -1,6 +1,5 @@
 .devcontainer/
 .github/
-.vscode/
 
 image.ppm
 image.png

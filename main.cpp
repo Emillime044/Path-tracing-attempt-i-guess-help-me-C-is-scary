@@ -73,9 +73,9 @@ int main() {
     HittableList items;
     items.add(new Sphere(vec3(2, 0, -4), 0.4, new Lambertian(vec3(0.8, 0.2, 0.2))));
     items.add(new Sphere(vec3(-2, 0, -3), 0.4, new Metal(vec3(0.2, 0.2, 0.8))));
-    items.add(new Sphere(vec3(0, 0, -5), 0.4, new Dielectric(glass)));
+    items.add(new Sphere(vec3(0, 0, -7), 0.4, new Dielectric(glass)));
     
-    items.add(new Sphere(vec3(0, -100.5, -10), 100.0, new Lambertian(vec3(0.7, 0.7, 0.7))));
+    items.add(new Sphere(vec3(0, -100.5, -10), 100.0, new Lambertian(vec3(0.2, 0.9, 0.2))));
 
     // Render
     const int samples = 100;
@@ -87,9 +87,12 @@ int main() {
 
     // Multithreading
     std::vector<vec3> pixels(image_width * image_height);
+    std::cerr << "Rendering " << image_width << "x" << image_height << " @ " << samples << " spp...\n";
     #pragma omp parallel for schedule(dynamic, 1)
 
     for (int j = 0; j < image_height; j++) {
+        #pragma omp critical
+        std::cerr << "\rRow " << j+1 << "/" << image_height << "  " << std::flush;
         for (int i = 0; i < image_width; i++) {
             vec3 color(0, 0, 0);
             for (int s = 0; s < samples; s++) {
